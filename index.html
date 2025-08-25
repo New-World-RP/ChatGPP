@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat - Din personliga AI-assistent</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Login Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="login-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h1>Välkommen till AI Chat</h1>
+                <p>Logga in för att komma igång med din personliga AI-assistent</p>
+            </div>
+            
+            <div class="login-tabs">
+                <button class="tab-btn active" onclick="switchTab('login')">Logga in</button>
+                <button class="tab-btn" onclick="switchTab('register')">Skapa konto</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="loginForm" class="login-form active">
+                <div class="form-group">
+                    <label for="loginUsername">Användarnamn</label>
+                    <input type="text" id="loginUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Lösenord</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Logga in
+                </button>
+            </form>
+            
+            <!-- Register Form -->
+            <form id="registerForm" class="login-form">
+                <div class="form-group">
+                    <label for="registerUsername">Användarnamn</label>
+                    <input type="text" id="registerUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">E-post</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Lösenord</label>
+                    <input type="password" id="registerPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Bekräfta lösenord</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-user-plus"></i> Skapa konto
+                </button>
+            </form>
+            
+            <div class="demo-info">
+                <p><strong>Demo-konto:</strong> användarnamn: "demo", lösenord: "demo123"</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App (hidden until login) -->
+    <div class="container" id="mainApp" style="display: none;">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <h3 id="currentUsername">Användare</h3>
+                        <span id="currentUserEmail">email@example.com</span>
+                    </div>
+                </div>
+                <button class="new-chat-btn" onclick="startNewChat()">
+                    <i class="fas fa-plus"></i> Ny chatt
+                </button>
+            </div>
+            
+            <div class="chat-history" id="chatHistory">
+                <!-- Chat history will be populated here -->
+            </div>
+            
+            <div class="sidebar-footer">
+                <button class="settings-btn" onclick="toggleSettings()">
+                    <i class="fas fa-cog"></i> Inställningar
+                </button>
+                <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeToggleBtn">
+                    <i class="fas fa-moon"></i> <span id="themeText">Mörkt tema</span>
+                </button>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logga ut
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="main-content">
+            <div class="chat-container" id="chatContainer">
+                <!-- Welcome message -->
+                <div class="welcome-message" id="welcomeMessage">
+                    <div class="welcome-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h1>Välkommen till AI Chat</h1>
+                    <p>Din personliga AI-assistent redo att hjälpa dig med alla frågor och uppgifter.</p>
+                    <div class="suggestion-chips">
+                        <button class="suggestion-chip" onclick="sendSuggestion('Berätta om AI och maskininlärning')">
+                            Berätta om AI och maskininlärning
+                        </button>
+                        <button class="suggestion-chip" onclick="sendSuggestion('Hjälp mig skriva en kod')">
+                            Hjälp mig skriva en kod
+                        </button>
+                        <button class="suggestion-chip" onclick="sendSuggestion('Förklara ett koncept')">
+                            Förklara ett koncept
+                        </button>
+                        <button class="suggestion-chip" onclick="sendSuggestion('Skriv en kreativ berättelse')">
+                            Skriv en kreativ berättelse
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Chat messages will appear here -->
+                <div class="messages" id="messages"></div>
+            </div>
+
+            <!-- Document Tools Button -->
+            <div class="document-tools-button-container">
+                <button class="document-tools-btn" onclick="openDocumentTools()" title="Öppna dokumentverktyg">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Dokumentverktyg</span>
+                </button>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Skriv ditt meddelande här..." 
+                        rows="1"
+                        onkeydown="handleKeyDown(event)"
+                    ></textarea>
+                    <button class="send-btn" onclick="sendMessage()" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="input-footer">
+                    <small>AI Chat kan göra fel. Kontrollera viktig information.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Inställningar</h3>
+                <button class="close-btn" onclick="toggleSettings()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-item">
+                    <label for="aiModel">AI-modell:</label>
+                    <select id="aiModel">
+                        <option value="gpt-4">GPT-4 (Rekommenderad)</option>
+                        <option value="gpt-3.5">GPT-3.5 (Snabbare)</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="temperature">Kreativitet:</label>
+                    <input type="range" id="temperature" min="0" max="2" step="0.1" value="0.7">
+                    <span id="tempValue">0.7</span>
+                </div>
+                <div class="setting-item">
+                    <label for="maxTokens">Max tokens:</label>
+                    <input type="number" id="maxTokens" min="100" max="4000" value="2000">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Thinking Indicator -->
+    <div class="ai-thinking" id="aiThinking">
+        <div class="thinking-header">
+            <div class="thinking-avatar">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="thinking-content">
+                <h4>AI tänker...</h4>
+                <p id="thinkingText">Analyserar din fråga...</p>
+            </div>
+        </div>
+        <div class="thinking-animation">
+            <div class="thinking-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Tools Modal -->
+    <div class="modal" id="documentToolsModal">
+        <div class="modal-content document-tools-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-alt"></i> Dokumentverktyg</h3>
+                <button class="close-btn" onclick="closeDocumentTools()">&times;</button>
+            </div>
+            <div class="modal-body">
+                                 <!-- File Upload Section -->
+                 <div class="tool-section">
+                     <h4><i class="fas fa-upload"></i> Ladda upp dokument & bilder</h4>
+                     <div class="file-upload-area">
+                         <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.bmp,.webp" multiple>
+                         <label for="fileInput" class="file-upload-label">
+                             <i class="fas fa-cloud-upload-alt"></i>
+                             <span>Välj filer eller släpp här</span>
+                             <small>Stöder PDF, Word, PowerPoint, Bilder (JPG, PNG, GIF, BMP, WebP)</small>
+                         </label>
+                     </div>
+                     <div class="uploaded-files" id="uploadedFiles"></div>
+                 </div>
+                
+                                 <!-- Document Templates Section -->
+                 <div class="tool-section">
+                     <h4><i class="fas fa-copy"></i> Dokumentmallar</h4>
+                     <div class="template-buttons">
+                         <button class="template-btn" onclick="generateLabReport()">
+                             <i class="fas fa-flask"></i> Labbrapport
+                         </button>
+                         <button class="template-btn" onclick="generateBusinessPlan()">
+                             <i class="fas fa-briefcase"></i> Affärsplan
+                         </button>
+                         <button class="template-btn" onclick="generateMeetingNotes()">
+                             <i class="fas fa-users"></i> Mötesanteckningar
+                         </button>
+                         <button class="template-btn" onclick="generateProjectPlan()">
+                             <i class="fas fa-project-diagram"></i> Projektplan
+                         </button>
+                     </div>
+                 </div>
+                 
+                                   <!-- Planning Support Section -->
+                  <div class="tool-section">
+                      <h4><i class="fas fa-calendar-alt"></i> Planeringsstöd</h4>
+                      <div class="template-buttons">
+                          <button class="template-btn" onclick="generateStudyPlan()">
+                              <i class="fas fa-graduation-cap"></i> Studieplan
+                          </button>
+                          <button class="template-btn" onclick="generateSchedule()">
+                              <i class="fas fa-clock"></i> Schema
+                          </button>
+                          <button class="template-btn" onclick="generateDeadlineReminders()">
+                              <i class="fas fa-bell"></i> Deadline-påminnelser
+                          </button>
+                          <button class="template-btn" onclick="generateTaskList()">
+                              <i class="fas fa-tasks"></i> Uppgiftslista
+                          </button>
+                      </div>
+                  </div>
+                  
+                  <!-- Visual Analysis Section -->
+                  <div class="tool-section">
+                      <h4><i class="fas fa-eye"></i> Visuell analys</h4>
+                      <div class="template-buttons">
+                          <button class="template-btn" onclick="analyzeImage()">
+                              <i class="fas fa-image"></i> Analysera bild
+                          </button>
+                          <button class="template-btn" onclick="extractTextFromImage()">
+                              <i class="fas fa-font"></i> Extrahera text
+                          </button>
+                          <button class="template-btn" onclick="analyzeDiagram()">
+                              <i class="fas fa-chart-line"></i> Analysera diagram
+                          </button>
+                          <button class="template-btn" onclick="readHandwriting()">
+                              <i class="fas fa-pen-fancy"></i> Läsa handskrift
+                          </button>
+                      </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
